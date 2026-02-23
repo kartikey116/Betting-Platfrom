@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Coins } from 'lucide-react';
 
 export default function Wallet({ balance }) {
     const [displayBalance, setDisplayBalance] = useState(balance);
@@ -9,9 +10,8 @@ export default function Wallet({ balance }) {
         if (balance !== displayBalance) {
             setAnimating(true);
 
-            // Animate the number change visually
             const diff = balance - displayBalance;
-            const steps = 10;
+            const steps = 15;
             const stepValue = diff / steps;
 
             let currentStep = 0;
@@ -24,7 +24,7 @@ export default function Wallet({ balance }) {
                 } else {
                     setDisplayBalance(prev => prev + stepValue);
                 }
-            }, 50);
+            }, 40);
 
             return () => clearInterval(interval);
         }
@@ -32,22 +32,25 @@ export default function Wallet({ balance }) {
 
     return (
         <motion.div
-            className={`px-4 py-2 rounded-xl border flex items-center gap-2 font-bold bg-slate-800 text-white
-        ${animating ? 'border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.3)]' : 'border-gameGold/50'}
+            className={`px-4 py-2 rounded-2xl flex items-center gap-3 font-bold bg-black/40 text-white border-2 backdrop-blur-md relative overflow-hidden
+        ${animating ? 'border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.5)] bg-red-500/10' : 'border-gameGold/30 shadow-[0_0_10px_rgba(234,179,8,0.2)]'}
         transition-all`}
-            animate={animating ? { scale: [1, 1.05, 1], color: ['#fff', '#ef4444', '#fff'] } : {}}
+            animate={animating ? { scale: [1, 1.1, 1], y: [0, -5, 0] } : {}}
             transition={{ duration: 0.3 }}
         >
-            <span className="text-gameGold text-sm">₹</span>
-            <span className="font-mono">{Math.round(displayBalance).toLocaleString('en-IN')}</span>
+            <Coins size={18} className={`${animating ? 'text-red-400' : 'text-gameGold'} transition-colors`} />
+
+            <span className="font-mono text-lg tracking-wider">
+                {Math.round(displayBalance).toLocaleString('en-IN')}
+            </span>
 
             <AnimatePresence>
                 {animating && balance < displayBalance && (
                     <motion.div
-                        initial={{ opacity: 1, y: 0, x: 0 }}
-                        animate={{ opacity: 0, y: -20, x: 10 }}
+                        initial={{ opacity: 1, y: 0, scale: 1.5 }}
+                        animate={{ opacity: 0, y: -40, scale: 0.5 }}
                         exit={{ opacity: 0 }}
-                        className="absolute top-0 right-0 text-red-500 font-bold text-sm pointer-events-none"
+                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-red-500 font-black text-2xl pointer-events-none drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]"
                     >
                         -{Math.round(displayBalance - balance)}
                     </motion.div>

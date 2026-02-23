@@ -67,3 +67,38 @@ To support **100k simultaneous bets**, the architecture employs the following st
 - **Framer Motion Elements**: Modals and balances animate elegantly to give a "casino" feel (see `Wallet.jsx` rolling number effect).
 - **Gamified Colors Theme**: Utilizing custom Neon styling directly in `tailwind.config.js` (`gameNeon`, `gameGold`, etc.) replacing standard dull UI templates.
 - **Smart Panna Algorithm**: Auto-completion logic is baked directly into the frontend which respects the sorting math rule `1 < 2 < 3 < 4 < 5 < 6 < 7 < 8 < 9 < 0` to suggest the best bets intelligently.
+
+
+
+1. The Header (Top Bar)
+Navigation: A back arrow (<) to easily return to your main Dashboard.
+Market Info: Displays the name of the active market you are betting in (e.g., "Laxmi Morning") and an indicator showing that the market is currently "OPEN".
+Wallet Status: Shows your live, real-time Wallet Balance (e.g., ₹50,000) so you know exactly how much you have available before betting.
+2. Bet Type Selector (Scrollable Tabs)
+Just below the header, you select the category of your bet before entering numbers:
+
+Single Digit: Pick exactly one number (0-9).
+Jodi: Pick a two-digit sequence (00-99).
+Single / Double / Triple Panna: Pick a three-digit sequence (000-999).
+3. Target Prediction (The Radar Input)
+This is the main input area where you type the number you want to bet on. It has a high-tech "Radar" style interface.
+
+The "Smart Panna" Rule in Action: If you have a "Panna" tab selected, this input area acts as a Smart Engine. If you type the digits 5, then 0, then 2 (502), the engine instantly applies your custom sorting rule (1 < 2 < 3 ... 9 < 0) and automatically rearranges the text to show 250 on the screen!
+4. Smart Suggestions
+Instead of typing, you can tap these four glowing buttons (labeled Hot, New, Gold, Trending).
+
+If you haven't typed anything yet, it suggests popular starting numbers based on your chosen Bet Type.
+If you start typing (e.g., you type 2), these buttons dynamically update to suggest valid Pannas or Jodis that start with 2.
+5. Stake Selection (Amount Options)
+Here, you define how much money you are betting.
+
+Quick-select buttons allow you to instantly tap ₹100, ₹500, ₹10K, etc.
+A MAX button instantly selects your entire remaining wallet balance.
+The total chosen amount highlights in blue and is summarized directly above the buttons.
+6. Confirm Bet & The "GPay" Execution Overlay
+Once you have entered a Number and selected a Stake, you press the blue CONFIRM BET button at the bottom. This triggers the immersive gamified sequence we just built:
+
+Processing HUD: A full-screen dark overlay pops up. A spinning neon-blue radar shows that the server is currently verifying your bet layout, checking your wallet, and applying the Panna filters.
+Payment Completed (GPay-style!): After a brief calculation, the spinning blue radar transforms into a glowing Green Checkmark.
+Deduction Summary: Massive text displays the exact amount successfully deducted (e.g. ₹500), alongside a receipt detailing the "Target Code" you bet on and the "Deducted from Wallet" confirmation.
+Auto-Dismiss: 2 seconds later, this overlay neatly disappears, and you'll see your Wallet Balance at the top of the screen perfectly updated to reflect the new amount!

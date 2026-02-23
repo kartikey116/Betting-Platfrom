@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@tailwindcss/postcss": "^4.2.0",
+    "@tailwindcss/vite": "^4.2.0",
     "axios": "^1.13.5",
     "formik": "^2.4.9",
     "framer-motion": "^12.34.3",

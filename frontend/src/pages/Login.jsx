@@ -2,10 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Phone, Lock } from 'lucide-react';
-import axios from 'axios';
 import toast from 'react-hot-toast';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export default function Login() {
     const [mobile, setMobile] = useState('');
@@ -19,70 +16,72 @@ export default function Login() {
         if (otp.length < 4) return toast.error('Enter valid OTP');
 
         setLoading(true);
-        try {
-            const res = await axios.post(`${API_URL}/auth/login`, { mobile, otp });
-            localStorage.setItem('token', res.data.token);
-            localStorage.setItem('user', JSON.stringify(res.data.user));
+
+        // Simulate API Call for dummy data
+        setTimeout(() => {
+            localStorage.setItem('token', 'dummy_token_123');
+            localStorage.setItem('user', JSON.stringify({
+                id: 1,
+                mobile: mobile,
+                wallet_balance: 50000,
+                role: mobile === '9999999999' ? 'admin' : 'user'
+            }));
             toast.success('Login Successful! Welcome to the Arena.');
             navigate('/dashboard');
-        } catch (err) {
-            toast.error(err.response?.data?.error || 'Login failed');
-        } finally {
             setLoading(false);
-        }
+        }, 1000);
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen w-full p-6 relative">
-            {/* Background elements */}
-            <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-gameAccent/20 to-transparent pointer-events-none"></div>
+        <div className="flex flex-col items-center justify-center min-h-screen w-full px-4 sm:p-6 relative bg-termBg font-sans">
+            {/* Background Grid */}
+            <div className="absolute inset-0 z-0 opacity-50 bg-[linear-gradient(rgba(17,17,17,0.8)_1px,transparent_1px),linear-gradient(90deg,rgba(17,17,17,0.8)_1px,transparent_1px)] bg-[size:30px_30px]"></div>
 
             <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
+                initial={{ scale: 0.95, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="w-full max-w-sm space-y-8 z-10"
+                className="w-full max-w-md sm:max-w-lg space-y-8 z-10 border border-gray-800 bg-[#080808]/90 p-6 sm:p-10 shadow-2xl relative"
             >
-                <div className="text-center space-y-2">
-                    <motion.div
-                        initial={{ y: -20, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.2 }}
-                        className="w-20 h-20 mx-auto bg-gradient-to-tr from-gameNeon to-gameAccent rounded-2xl shadow-[0_0_30px_rgba(16,185,129,0.3)] flex items-center justify-center mb-6"
-                    >
-                        <span className="text-4xl font-extrabold text-white">777</span>
-                    </motion.div>
-                    <h1 className="text-3xl font-black tracking-tight text-white mb-1">
-                        LUCKY <span className="text-gameNeon">STRIKE</span>
+                {/* Decorative corner pieces */}
+                <div className="absolute top-0 left-0 w-4 h-4 border-t border-l border-[#00f0ff]"></div>
+                <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-[#00f0ff]"></div>
+                <div className="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-[#00f0ff]"></div>
+                <div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-[#00f0ff]"></div>
+                <div className="text-center space-y-2 mb-8">
+                    <h1 className="text-6xl sm:text-7xl mt-2 font-hand font-bold text-[#00f0ff] drop-shadow-[0_0_20px_rgba(0,240,255,0.5)] tracking-wide">
+                        Luminance
                     </h1>
-                    <p className="text-slate-400 font-medium">Enter your credentials to join the game</p>
+                    <div className="inline-block border-t border-b border-[#d926a9] text-[#d926a9] font-mono text-[10px] tracking-[0.4em] font-bold uppercase px-6 py-2 bg-[#d926a9]/5 mt-2">
+                        Tactical Betting Syndicate
+                    </div>
                 </div>
 
-                <form onSubmit={handleLogin} className="space-y-5 mt-10">
+                <form onSubmit={handleLogin} className="space-y-6">
                     <div className="space-y-4">
                         <div className="relative group">
-                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-gameNeon transition-colors">
-                                <Phone size={20} />
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-[#00f0ff] transition-colors">
+                                <Phone size={18} />
                             </div>
                             <input
                                 type="tel"
                                 value={mobile}
                                 onChange={(e) => setMobile(e.target.value)}
                                 placeholder="Mobile Number"
-                                className="w-full bg-slate-900/50 border border-slate-700/50 text-white placeholder-slate-500 text-lg rounded-2xl pl-12 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-gameNeon/50 focus:border-gameNeon/50 transition-all backdrop-blur-sm"
+                                className="w-full bg-[#111] border border-gray-800 text-white placeholder-gray-600 text-base md:text-lg rounded-none pl-12 pr-4 py-4 md:py-5 font-mono tracking-widest focus:outline-none focus:border-[#00f0ff] focus:shadow-[0_0_15px_rgba(0,240,255,0.2)] transition-all"
                             />
                         </div>
 
                         <div className="relative group">
-                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-gameAccent transition-colors">
-                                <Lock size={20} />
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-[#d926a9] transition-colors">
+                                <Lock size={18} />
                             </div>
                             <input
                                 type="text"
                                 value={otp}
                                 onChange={(e) => setOtp(e.target.value)}
                                 placeholder="Any 6-digit OTP"
-                                className="w-full bg-slate-900/50 border border-slate-700/50 text-white placeholder-slate-500 text-lg rounded-2xl pl-12 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-gameAccent/50 focus:border-gameAccent/50 transition-all backdrop-blur-sm"
+                                className="w-full bg-[#111] border border-gray-800 text-white placeholder-gray-600 text-base md:text-lg rounded-none pl-12 pr-4 py-4 md:py-5 font-mono tracking-widest focus:outline-none focus:border-[#d926a9] focus:shadow-[0_0_15px_rgba(217,38,169,0.2)] transition-all"
                             />
                         </div>
                     </div>
@@ -91,14 +90,17 @@ export default function Login() {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         disabled={loading}
-                        className="w-full bg-gradient-to-r from-gameNeon to-gameAccent text-white font-bold text-lg rounded-2xl py-4 shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:shadow-[0_0_30px_rgba(16,185,129,0.6)] transition-all disabled:opacity-70 flex justify-center items-center"
+                        className="w-full bg-[#00ff41]/10 border border-[#00ff41] text-[#00ff41] hover:bg-[#00ff41] hover:text-black font-mono font-bold text-lg md:text-xl py-4 md:py-5 shadow-[0_0_15px_rgba(0,255,65,0.2)] hover:shadow-[0_0_30px_rgba(0,255,65,0.6)] transition-all disabled:opacity-50 flex justify-center items-center tracking-[0.3em] uppercase mt-8 relative group overflow-hidden"
                     >
+                        {/* Button Shine effect */}
+                        {!loading && <div className="absolute top-0 -left-[100%] w-1/2 h-full bg-gradient-to-r from-transparent via-white/50 to-transparent skew-x-[-30deg] group-hover:animate-[shine_1s_ease-in-out]"></div>}
+
                         {loading ? (
-                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                        ) : "PLAY NOW"}
+                            <span className="flex items-center gap-2 relative z-10 text-[#00ff41]">
+                                <span className="w-5 h-5 rounded-full border-2 border-[#00ff41] border-t-transparent animate-spin"></span>
+                                [ AUTHENTICATING ]
+                            </span>
+                        ) : <span className="relative z-10 flex items-center gap-2">CONNECT</span>}
                     </motion.button>
                 </form>
             </motion.div>

@@ -13,27 +13,29 @@ const PrivateRoute = ({ children }) => {
 function App() {
     return (
         <Router>
-            <div className="min-h-screen bg-gameBg text-white font-sans selection:bg-gameAccent/30">
-                <div className="max-w-md mx-auto w-full min-h-screen relative shadow-2xl bg-gameBg overflow-hidden border-x border-slate-800/50">
-                    <Routes>
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/admin" element={<Admin />} />
+            <div className="min-h-screen w-full text-white font-sans selection:bg-[#ff003c]/30 flex justify-center bg-[#050505]">
+                <Routes>
+                    <Route path="/login" element={<div className="w-full bg-[#0A111F] min-h-screen relative"><Login /></div>} />
+                    <Route path="/admin" element={<div className="w-full relative min-h-screen bg-[#0A0A0A]"><Admin /></div>} />
 
-                        <Route path="/dashboard" element={
-                            <PrivateRoute>
+                    <Route path="/dashboard" element={
+                        <PrivateRoute>
+                            <div className="w-full bg-[#0A111F] min-h-screen relative">
                                 <Dashboard />
-                            </PrivateRoute>
-                        } />
+                            </div>
+                        </PrivateRoute>
+                    } />
 
-                        <Route path="/market/:id" element={
-                            <PrivateRoute>
+                    <Route path="/market/:id" element={
+                        <PrivateRoute>
+                            <div className="w-full bg-[#0A111F] min-h-screen relative">
                                 <MarketBetting />
-                            </PrivateRoute>
-                        } />
+                            </div>
+                        </PrivateRoute>
+                    } />
 
-                        <Route path="*" element={<Navigate to="/dashboard" />} />
-                    </Routes>
-                </div>
+                    <Route path="*" element={<Navigate to="/dashboard" />} />
+                </Routes>
             </div>
         </Router>
     );
