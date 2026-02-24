@@ -6,7 +6,8 @@ A production-ready, mobile-first betting web application featuring a highly gami
 
 ### 👤 User Functionalities (Frontend & Backend)
 - **Secure Authentication:** JWT-based stateless login system for rapid, database-light authentication.
-- **Dynamic Dashboard:** Real-time visibility into active and closed markets.
+- **Real-Time WebSockets Architecture:** Fully integrated `Socket.IO` system replacing heavy HTTP polling. Users instantly receive live `market-status` and `result-declared` events without refreshing.
+- **Dynamic Dashboard:** Real-time visibility into active and closed markets driven by WebSocket events.
 - **Real-Time Wallet:** Live balance tracking utilizing ACID-compliant transactions with row-level locking (prevents race conditions perfectly).
 - **Gamified Betting Interface:**
   - **Bet Types Supported:** Single Digit (0-9), Jodi (00-99), and Panna (Single/Double/Triple 000-999).
@@ -17,9 +18,9 @@ A production-ready, mobile-first betting web application featuring a highly gami
 
 ### 🛡️ Admin Functionalities (Frontend & Backend)
 - **Overview Dashboard:** Comprehensive real-time view of total bets placed today, total money volume (₹), count of active users, and status of all available markets.
-- **Market Control:** Granular control panel to schedule automatic Open/Close timings for markets or manually override their status.
-- **Live Monitoring:** Real-time polling feed displaying all incoming bets instantly. Features filtering by market and separating bets strictly by "Today" and "Yesterday."
-- **Results Management:** Authorized capability to declare winning patterns for specific markets seamlessly. Retains historical winning logs and statuses.
+- **Market Control:** Granular control panel to schedule automatic Open/Close timings for markets or manually override their status. (Status changes emit socket events instantly to all online users).
+- **Live Monitoring:** Instantaneous WebSocket feed listening to `new-bet` events. Displays incoming bets live without querying the database via HTTP intervals. Features filtering by market and separating bets strictly by "Today" and "Yesterday."
+- **Results Management:** Authorized capability to declare winning patterns for specific markets seamlessly. Instantly emits `result-declared` to force all connected clients to reload final statuses.
 - **Daily Reset System:** Automated midnight Cron jobs to strictly isolate days, archiving previous bets, and seamlessly opening fresh sheets for new markets without downtime. (Manual trigger available for debugging).
 
 ---
@@ -204,11 +205,14 @@ To support **100k+ simultaneous bets**, the architecture employs the following r
 4. **Rate Limiting:**
    `express-rate-limit` prevents DDoS by capping requests by IP to 1000 requests per 15-minute window.
 
-5. **Optimized Indexes:**
+5. **Socket.IO Event Driven Updates:**
+   By replacing 5-second `setInterval` HTTP polling with a single persistent WebSocket connection per client, server load is reduced exponentially. The server selectively broadcasts events (`new-bet`, `market-status`) only when data mutations actually occur.
+
+6. **Optimized Indexes:**
    Crucial exact-match columns (`selected_number`, `market_id`, `created_at`) have explicit B-Tree indexes in `schema.sql`, assuring O(log n) lookups for aggregate tasks like "How many users bet on 120 today?".
 
-6. **Next Steps for 1M+ Scale:**
-   - Appending Redis for caching market metadata (static timings).
+7. **Next Steps for 1M+ Scale:**
+   - Appending Redis for caching market metadata (static timings) and Socket.IO adapters for multi-node messaging.
    - Establishing a queueing system (RabbitMQ/Kafka) for asynchronous bet processing and ledger writes instead of immediate synchronous inserts.
 
 ---
