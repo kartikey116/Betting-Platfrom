@@ -8,31 +8,19 @@ const placeBet = async (req, res) => {
   const { marketId, betType, selectedNumber, amount } = req.body;
   const userId = req.user.id;
 
-  /* ---------- Basic Validation ---------- */
-
   if (!marketId || !betType || !selectedNumber || !amount)
     return res.status(400).json({ error: "All fields required" });
 
-  if (amount <= 0)
+  if (amount <= 0 || amount > 100000)
     return res.status(400).json({ error: "Invalid amount" });
 
-  if (amount > 100000)
-    return res.status(400).json({ error: "Amount too large" });
-
-  /* ---------- Game Type Validation ---------- */
-
   const validationError = validateBet(betType, selectedNumber);
-
   if (validationError)
     return res.status(400).json({ error: validationError });
-
-  /* ---------- Normalize Number ---------- */
 
   const finalNumber = normalizeNumber(betType, selectedNumber);
 
   try {
-
-    /* ---------- Call DB Transaction Function ---------- */
 
     await db.query(
       `SELECT place_bet($1,$2,$3,$4,$5)`,
@@ -41,21 +29,16 @@ const placeBet = async (req, res) => {
 
     res.json({
       success: true,
-      message: "Bet placed successfully",
       number: finalNumber
     });
 
   } catch (err) {
-
-    console.error("Bet Error:", err.message);
-
-    /* ---------- Known DB Errors ---------- */
+    console.error("BET ERROR:", err.message);
 
     if (
       err.message.includes("Insufficient") ||
       err.message.includes("closed") ||
-      err.message.includes("inactive") ||
-      err.message.includes("Invalid")
+      err.message.includes("inactive")
     ) {
       return res.status(400).json({ error: err.message });
     }
@@ -63,6 +46,8 @@ const placeBet = async (req, res) => {
     res.status(500).json({ error: "Failed to place bet" });
   }
 };
+
+module.exports = { placeBet };
 
 
 

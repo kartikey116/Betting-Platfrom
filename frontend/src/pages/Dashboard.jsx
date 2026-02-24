@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { User, Bell, Home, LayoutList, UserCircle } from 'lucide-react';
 import Wallet from '../components/Wallet';
+import axios from 'axios';
 
 export default function Dashboard() {
     const [markets, setMarkets] = useState([]);
@@ -11,24 +12,48 @@ export default function Dashboard() {
 
     useEffect(() => {
         fetchMarkets();
-        const interval = setInterval(fetchMarkets, 1000);
+        fetchUser();
+        const interval = setInterval(() => {
+            fetchMarkets();
+            fetchUser();
+        }, 5000);
         return () => clearInterval(interval);
     }, []);
 
-    const fetchMarkets = () => {
-        const dummyMarkets = [
-            { id: 1, name: 'Laxmi Morning', ref: '#LX-204', status: 'DECLARED', result: '345-23-148', countdown: 0, players: '', theme: 'neon' },
-            { id: 2, name: 'Shridevi Morning', ref: '#SD-109', status: 'OPEN', countdown: 29712, players: '+1.2k playing', theme: 'neon' },
-            { id: 3, name: 'Karnatak Day', ref: '#KD-088', status: 'CLOSED', countdown: 0, players: '', theme: 'gray' }
-        ];
+    const fetchUser = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) return navigate('/');
+            const res = await axios.get('http://localhost:5000/api/wallet/', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setUser(prev => ({ ...prev, wallet_balance: res.data.balance }));
+        } catch (e) {
+            if (e.response?.status === 401 || e.response?.status === 403) navigate('/');
+        }
+    };
 
-        const now = new Date();
-        const secondsAdded = Math.floor(now.getTime() / 1000) % 60;
-
-        setMarkets(dummyMarkets.map(m => ({
-            ...m,
-            countdown: Math.max(0, m.countdown - secondsAdded)
-        })));
+    const fetchMarkets = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+            const res = await axios.get('http://localhost:5000/api/markets', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const enhanced = res.data.map(m => ({
+                id: m.id,
+                name: m.name,
+                ref: `#MKT-${m.id}`,
+                status: m.computed_status ? m.computed_status.toUpperCase() : 'CLOSED',
+                countdown: Math.floor(m.countdown || 0),
+                result: 'AWAITING-RESULT',
+                players: '',
+                theme: 'neon'
+            }));
+            setMarkets(enhanced);
+        } catch (error) {
+            console.error("Error fetching markets", error);
+        }
     };
 
     const formatTime = (seconds) => {

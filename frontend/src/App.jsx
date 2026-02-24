@@ -15,7 +15,7 @@ function App() {
         <Router>
             <div className="min-h-screen w-full text-white font-sans selection:bg-[#ff003c]/30 flex justify-center bg-[#050505]">
                 <Routes>
-                    <Route path="/login" element={<div className="w-full bg-[#0A111F] min-h-screen relative"><Login /></div>} />
+                    <Route path="/" element={<div className="w-full bg-[#0A111F] min-h-screen relative"><Login /></div>} />
                     <Route path="/admin" element={<div className="w-full relative min-h-screen bg-[#0A0A0A]"><Admin /></div>} />
 
                     <Route path="/dashboard" element={

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Phone, Lock } from 'lucide-react';
 import toast from 'react-hot-toast';
+import axios from 'axios';
 
 export default function Login() {
     const [mobile, setMobile] = useState('');
@@ -17,19 +18,20 @@ export default function Login() {
 
         setLoading(true);
 
-        // Simulate API Call for dummy data
-        setTimeout(() => {
-            localStorage.setItem('token', 'dummy_token_123');
-            localStorage.setItem('user', JSON.stringify({
-                id: 1,
-                mobile: mobile,
-                wallet_balance: 50000,
-                role: mobile === '9999999999' ? 'admin' : 'user'
-            }));
+        try {
+            const res = await axios.post('http://localhost:5000/api/auth/login', { mobile, otp });
+
+            localStorage.setItem('token', res.data.token);
+            localStorage.setItem('user', JSON.stringify(res.data.user));
+
             toast.success('Login Successful! Welcome to the Arena.');
             navigate('/dashboard');
+        } catch (error) {
+            console.error(error);
+            toast.error(error.response?.data?.error || 'Login failed');
+        } finally {
             setLoading(false);
-        }, 1000);
+        }
     };
 
     return (

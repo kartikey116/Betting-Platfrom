@@ -151,7 +151,7 @@ export default function MarketBetting() {
     }, [number, activeBetTypeInfo.maxLen]);
 
     const handlePlaceBet = async () => {
-        if (market.status !== 'open') {
+        if (market.computed_status !== 'open') {
             return toast.error("Market is closed. Cannot place bets.");
         }
         if (!number || number.length !== activeBetTypeInfo.maxLen) {
@@ -165,9 +165,9 @@ export default function MarketBetting() {
 
         try {
             await axios.post(`${API_URL}/bets/place`, {
-                market_id: market.id,
-                bet_type: betType,
-                number: number,
+                marketId: market.id,
+                betType: betType,
+                selectedNumber: number,
                 amount: amt
             });
 
@@ -419,7 +419,7 @@ export default function MarketBetting() {
                         <div className="min-w-0">
                             <h1 className="text-sm font-black text-[#0075FF] tracking-widest uppercase truncate">{market.name}</h1>
                             <p className="text-[10px] text-gray-400 font-bold tracking-widest flex items-center gap-1">
-                                {market.status === 'open' ? (
+                                {market.computed_status === 'open' ? (
                                     <><span className="w-1.5 h-1.5 rounded-full bg-[#00FF41]"></span> MARKET OPEN</>
                                 ) : (
                                     <><span className="w-1.5 h-1.5 rounded-full bg-[red]"></span> MARKET CLOSED</>
@@ -542,14 +542,14 @@ export default function MarketBetting() {
                     </div>
 
                     <button
-                        disabled={loading || market.status !== 'open'}
+                        disabled={loading || market.computed_status !== 'open'}
                         onClick={handlePlaceBet}
-                        className={`w-full ${market.status !== 'open' ? 'bg-gray-600 cursor-not-allowed' : 'bg-[#185ACB] hover:bg-[#0075FF] shadow-[0_10px_30px_-5px_rgba(0,117,255,0.4)]'} text-white font-black tracking-[0.2em] text-sm py-5 rounded-[2rem] uppercase transition-all flex items-center justify-center gap-2 group relative overflow-hidden`}
+                        className={`w-full ${market.computed_status !== 'open' ? 'bg-gray-600 cursor-not-allowed' : 'bg-[#185ACB] hover:bg-[#0075FF] shadow-[0_10px_30px_-5px_rgba(0,117,255,0.4)]'} text-white font-black tracking-[0.2em] text-sm py-5 rounded-[2rem] uppercase transition-all flex items-center justify-center gap-2 group relative overflow-hidden`}
                     >
                         {/* Inner Top Glow */}
                         <div className="absolute top-0 left-0 w-full h-[1px] bg-white opacity-40"></div>
 
-                        {market.status !== 'open' ? 'MARKET CLOSED' : loading ? 'PROCESSING...' : <><CheckCircle2 size={16} /> CONFIRM BET</>}
+                        {market.computed_status !== 'open' ? 'MARKET CLOSED' : loading ? 'PROCESSING...' : <><CheckCircle2 size={16} /> CONFIRM BET</>}
                     </button>
                     <p className="text-center font-mono text-[7px] text-gray-500 tracking-[0.3em] uppercase mt-4">ENCRYPTED TRANSACTION • SECURE HUD TERMINAL V4.2</p>
                 </div>

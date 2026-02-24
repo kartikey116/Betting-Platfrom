@@ -32,9 +32,69 @@ exports.sendOtp = async (req, res) => {
 
 
 
-/* ===============================
-   LOGIN / VERIFY OTP
-================================ */
+/*LOGIN / VERIFY OTP */
+// exports.login = async (req, res) => {
+//   const { mobile, otp } = req.body;
+
+//   if (!mobile || !otp)
+//     return res.status(400).json({ error: "Mobile and OTP required" });
+
+//   try {
+//       const record = otpStore.get(mobile);
+
+//       if (!record)
+//         return res.status(400).json({ error: "OTP expired" });
+
+//       if (record.otp != otp)
+//         return res.status(400).json({ error: "Invalid OTP" });
+
+//       if (Date.now() > record.expires)
+//         return res.status(400).json({ error: "OTP expired" });
+
+//       otpStore.delete(mobile);
+
+//     // find user
+//     let { rows } = await db.query(
+//       "SELECT * FROM users WHERE mobile = $1",
+//       [mobile]
+//     );
+
+//     let user = rows[0];
+
+//     // auto create user
+//     if (!user) {
+//       const result = await db.query(
+//         `INSERT INTO users (mobile, wallet_balance, role)
+//          VALUES ($1,$2,$3)
+//          RETURNING *`,
+//         [mobile, INITIAL_WALLET_BALANCE, "user"]
+//       );
+
+//       user = result.rows[0];
+//     }
+
+//     // create token
+//     const token = jwt.sign(
+//       {
+//         id: user.id,
+//         mobile: user.mobile,
+//         role: user.role
+//       },
+//       JWT_SECRET,
+//       { expiresIn: "7d" }
+//     );
+
+//     res.json({
+//       message: "Login successful",
+//       token,
+//       user
+//     });
+
+//   } catch (err) {
+//     console.error("Login error:", err);
+//     res.status(500).json({ error: "Server error" });
+//   }
+// };
 exports.login = async (req, res) => {
   const { mobile, otp } = req.body;
 
@@ -42,22 +102,12 @@ exports.login = async (req, res) => {
     return res.status(400).json({ error: "Mobile and OTP required" });
 
   try {
-    const record = otpStore.get(mobile);
 
-    if (!record)
-      return res.status(400).json({ error: "OTP expired" });
-
-    if (record.otp != otp)
-      return res.status(400).json({ error: "Invalid OTP" });
-
-    if (Date.now() > record.expires)
-      return res.status(400).json({ error: "OTP expired" });
-
-    otpStore.delete(mobile);
+    console.log("DEV LOGIN → OTP bypassed");
 
     // find user
     let { rows } = await db.query(
-      "SELECT * FROM users WHERE mobile = $1",
+      "SELECT * FROM users WHERE phone = $1",
       [mobile]
     );
 
@@ -66,20 +116,19 @@ exports.login = async (req, res) => {
     // auto create user
     if (!user) {
       const result = await db.query(
-        `INSERT INTO users (mobile, wallet_balance, role)
+        `INSERT INTO users (phone, wallet_balance, role)
          VALUES ($1,$2,$3)
          RETURNING *`,
-        [mobile, INITIAL_WALLET_BALANCE, "user"]
+        [mobile, 50000, "user"]
       );
 
       user = result.rows[0];
     }
 
-    // create token
     const token = jwt.sign(
       {
         id: user.id,
-        mobile: user.mobile,
+        mobile: user.phone,
         role: user.role
       },
       JWT_SECRET,
@@ -94,10 +143,9 @@ exports.login = async (req, res) => {
 
   } catch (err) {
     console.error("Login error:", err);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: err.message });
   }
 };
-
 
 
 /* ===============================
@@ -136,7 +184,7 @@ exports.getProfile = async (req, res) => {
     const { id } = req.user;
 
     const { rows } = await db.query(
-      "SELECT id,mobile,wallet_balance,role FROM users WHERE id=$1",
+      "SELECT id,phone,wallet_balance,role FROM users WHERE id=$1",
       [id]
     );
 
