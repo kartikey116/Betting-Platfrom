@@ -65,6 +65,15 @@ Here is a glimpse of the robust Admin Dashboard for MarketHub:
 
 ---
 
+## 🗄️ Database Architecture
+
+Below is the entity-relationship diagram representing the core PostgreSQL schema used by the platform:
+
+![Database Schema](supabase-schema-ptkeaosdjmrqsnlbxdyy.png)
+*High-performance schema featuring ACID-compliant wallets, real-time bet tracking, and dynamic regional market schedules.*
+
+---
+
 ## 🚀 Quick Start (Local Development)
 
 ### Prerequisites
