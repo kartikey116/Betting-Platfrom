@@ -106,7 +106,7 @@ export default function Dashboard() {
 
             <main className="px-5 mt-6">
                 <div className="mb-6">
-                    <h1 className="text-5xl font-hand tracking-wider mb-2 text-[#00f0ff] drop-shadow-[0_0_15px_rgba(0,240,255,0.4)] mt-2">Market Hub</h1>
+                    <h1 className="text-2xl sm:text-4xl md:text-5xl font-hand tracking-wider mb-2 text-[#00f0ff] drop-shadow-[0_0_15px_rgba(0,240,255,0.4)] mt-2">Market Hub</h1>
                     <p className="text-xs text-gray-400 font-medium">Predict and win in real-time markets</p>
                 </div>
 

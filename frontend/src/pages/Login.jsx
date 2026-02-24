@@ -51,7 +51,7 @@ export default function Login() {
                 <div className="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-[#00f0ff]"></div>
                 <div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-[#00f0ff]"></div>
                 <div className="text-center space-y-2 mb-8">
-                    <h1 className="text-5xl sm:text-7xl mt-2 font-hand font-normal text-[#00f0ff] drop-shadow-[0_0_20px_rgba(0,240,255,0.5)] tracking-wide">
+                    <h1 className="text-2xl sm:text-4xl md:text-5xl mt-2 font-hand font-normal text-[#00f0ff] drop-shadow-[0_0_20px_rgba(0,240,255,0.5)] tracking-wide">
                         MarketHUB
                     </h1>
                     <div className="inline-block border-t border-b border-[#d926a9] text-[#d926a9] font-mono text-[10px] tracking-[0.4em] font-bold uppercase px-6 py-2 bg-[#d926a9]/5 mt-2">
