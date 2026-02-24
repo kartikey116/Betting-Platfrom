@@ -19,7 +19,7 @@ export default function Login() {
         setLoading(true);
 
         try {
-            const res = await axios.post('http://localhost:5000/api/auth/login', { mobile, otp });
+            const res = await axios.post('https://betting-platfrom.onrender.com/api/auth/login', { mobile, otp });
 
             localStorage.setItem('token', res.data.token);
             localStorage.setItem('user', JSON.stringify(res.data.user));

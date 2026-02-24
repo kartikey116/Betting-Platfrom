@@ -6,7 +6,7 @@ import { io } from 'socket.io-client';
 import './Admin.css';
 
 // Admin API config
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'https://betting-platfrom.onrender.com/api';
 
 export default function Admin() {
     const navigate = useNavigate();
@@ -86,7 +86,7 @@ export default function Admin() {
         if (!isLoggedIn) return;
 
         // Connect to socket
-        const socket = io('http://localhost:5000'); // Adjust URL if needed based on environment
+        const socket = io('https://betting-platfrom.onrender.com'); // Adjust URL if needed based on environment
 
         socket.on('connect', () => {
             console.log('Admin socket connected');

@@ -16,7 +16,7 @@ export default function Dashboard() {
         fetchUser();
 
         // Connect to socket
-        const socket = io('http://localhost:5000'); // Adjust URL if needed
+        const socket = io('https://betting-platfrom.onrender.com'); // Adjust URL if needed
 
         socket.on('connect', () => {
             console.log('Dashboard socket connected');
@@ -38,7 +38,7 @@ export default function Dashboard() {
         try {
             const token = localStorage.getItem('token');
             if (!token) return navigate('/');
-            const res = await axios.get('http://localhost:5000/api/wallet/', {
+            const res = await axios.get('https://betting-platfrom.onrender.com/api/wallet/', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setUser(prev => ({ ...prev, wallet_balance: res.data.balance }));
@@ -51,7 +51,7 @@ export default function Dashboard() {
         try {
             const token = localStorage.getItem('token');
             if (!token) return;
-            const res = await axios.get('http://localhost:5000/api/markets', {
+            const res = await axios.get('https://betting-platfrom.onrender.com/api/markets', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             const enhanced = res.data.map(m => ({

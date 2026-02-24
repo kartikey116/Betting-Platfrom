@@ -8,7 +8,7 @@ import axios from 'axios';
 import { io } from 'socket.io-client';
 
 // API config
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'https://betting-platfrom.onrender.com/api';
 
 const BET_TYPES = [
     { id: 'Single', name: 'Single Digit', maxLen: 1 },
@@ -95,7 +95,7 @@ export default function MarketBetting() {
             fetchData();
 
             // Connect to socket for real-time updates
-            const socket = io('http://localhost:5000');
+            const socket = io('https://betting-platfrom.onrender.com');
 
             socket.on('connect', () => {
                 console.log('MarketBetting socket connected');
