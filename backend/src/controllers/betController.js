@@ -1,9 +1,7 @@
 const db = require("../db/config");
 const { validateBet, normalizeNumber } = require("../utils/panna.js");
+const { emitEvent } = require("../utils/socket");
 
-/* ===============================
-   PLACE BET
-================================ */
 const placeBet = async (req, res) => {
   const { marketId, betType, selectedNumber, amount } = req.body;
   const userId = req.user.id;
@@ -21,49 +19,48 @@ const placeBet = async (req, res) => {
   const finalNumber = normalizeNumber(betType, selectedNumber);
 
   try {
-
     await db.query(
       `SELECT place_bet($1,$2,$3,$4,$5)`,
       [userId, marketId, betType, finalNumber, amount]
     );
 
-    res.json({
-      success: true,
-      number: finalNumber
+    /* SOCKET EVENT */
+    emitEvent("new-bet", {
+      userId,
+      marketId,
+      betType,
+      number: finalNumber,
+      amount,
+      createdAt: new Date()
     });
+
+    console.log({
+      userId,
+      marketId,
+      betType,
+      finalNumber,
+      amount
+    });
+
+    res.json({ success: true });
 
   } catch (err) {
     console.error("BET ERROR:", err.message);
-
-    if (
-      err.message.includes("Insufficient") ||
-      err.message.includes("closed") ||
-      err.message.includes("inactive")
-    ) {
-      return res.status(400).json({ error: err.message });
-    }
-
-    res.status(500).json({ error: "Failed to place bet" });
+    res.status(400).json({ error: err.message, details: err.details, hint: err.hint });
   }
 };
 
-module.exports = { placeBet };
 
 
-
-/* ===============================
-   USER BET HISTORY
-================================ */
 const getUserBets = async (req, res) => {
   try {
-    const { rows } = await db.query(
-      `SELECT b.*, m.name AS market_name
-       FROM bets b
-       JOIN markets m ON m.id = b.market_id
-       WHERE b.user_id = $1
-       ORDER BY b.created_at DESC`,
-      [req.user.id]
-    );
+    const { rows } = await db.query(`
+      SELECT b.*,m.name AS market_name
+      FROM bets b
+      JOIN markets m ON m.id=b.market_id
+      WHERE b.user_id=$1
+      ORDER BY b.created_at DESC
+    `, [req.user.id]);
 
     res.json(rows);
 

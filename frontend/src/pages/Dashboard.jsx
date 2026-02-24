@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { User, Bell, Home, LayoutList, UserCircle } from 'lucide-react';
 import Wallet from '../components/Wallet';
 import axios from 'axios';
+import { io } from 'socket.io-client';
 
 export default function Dashboard() {
     const [markets, setMarkets] = useState([]);
@@ -13,11 +14,24 @@ export default function Dashboard() {
     useEffect(() => {
         fetchMarkets();
         fetchUser();
-        const interval = setInterval(() => {
-            fetchMarkets();
-            fetchUser();
-        }, 5000);
-        return () => clearInterval(interval);
+
+        // Connect to socket
+        const socket = io('http://localhost:5000'); // Adjust URL if needed
+
+        socket.on('connect', () => {
+            console.log('Dashboard socket connected');
+        });
+
+        socket.on('market-status', () => fetchMarkets());
+        socket.on('market-updated', () => fetchMarkets());
+        socket.on('result-declared', () => fetchMarkets());
+
+        // We can also listen to user-specific wallet updates if implemented in the future
+        // socket.on('wallet-updated', () => fetchUser());
+
+        return () => {
+            socket.disconnect();
+        };
     }, []);
 
     const fetchUser = async () => {

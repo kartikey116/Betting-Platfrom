@@ -8,10 +8,6 @@ const INITIAL_WALLET_BALANCE = 50000;
 const otpStore = new Map();
 
 
-
-/* ===============================
-   SEND OTP
-================================ */
 exports.sendOtp = async (req, res) => {
   const { mobile } = req.body;
 
@@ -103,7 +99,13 @@ exports.login = async (req, res) => {
 
   try {
 
-    console.log("DEV LOGIN → OTP bypassed");
+    // --- DUMMY CREDENTIALS BYPASS ---
+    if (mobile === "9999999999" && otp === "123456") {
+      console.log("DEV LOGIN → Dummy User Triggered");
+    } else {
+      console.log("DEV LOGIN → OTP bypassed");
+      // Add real OTP logic here if needed in production
+    }
 
     // find user
     let { rows } = await db.query(
@@ -148,16 +150,14 @@ exports.login = async (req, res) => {
 };
 
 
-/* ===============================
-   ADMIN LOGIN
-================================ */
 exports.adminLogin = async (req, res) => {
   const { email, password } = req.body;
 
-  if (
-    email === process.env.ADMIN_EMAIL &&
-    password === process.env.ADMIN_PASS
-  ) {
+  // Environment credentials or Dummy fallback
+  const isAdmin = (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASS) ||
+    (email === "admin@market.com" && password === "admin123");
+
+  if (isAdmin) {
     const token = jwt.sign(
       { role: "admin", email },
       JWT_SECRET,
@@ -176,9 +176,6 @@ exports.adminLogin = async (req, res) => {
 
 
 
-/* ===============================
-   GET PROFILE
-================================ */
 exports.getProfile = async (req, res) => {
   try {
     const { id } = req.user;

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import axios from 'axios';
+import { io } from 'socket.io-client';
 import './Admin.css';
 
 // Admin API config
@@ -80,16 +81,39 @@ export default function Admin() {
 
     }, [isLoggedIn]);
 
-    // Live Feed Polling
+    // Live Feed & Market Updates via Socket.io
     useEffect(() => {
         if (!isLoggedIn) return;
 
-        const interval = setInterval(() => {
-            fetchLiveBets(true); // silent fetch to avoid too many loading states
-            fetchMarkets(true);
-        }, 5000); // Poll every 5 seconds
+        // Connect to socket
+        const socket = io('http://localhost:5000'); // Adjust URL if needed based on environment
 
-        return () => clearInterval(interval);
+        socket.on('connect', () => {
+            console.log('Admin socket connected');
+        });
+
+        socket.on('new-bet', (data) => {
+            // Can either fetch again or optimistically insert if we are viewing today
+            fetchLiveBets(true);
+            fetchMarkets(true); // sometimes bets affect market volume/stats
+        });
+
+        socket.on('market-status', (data) => {
+            fetchMarkets(true);
+        });
+
+        socket.on('market-updated', (data) => {
+            fetchMarkets(true);
+        });
+
+        socket.on('result-declared', (data) => {
+            fetchMarkets(true);
+            fetchResults();
+        });
+
+        return () => {
+            socket.disconnect();
+        };
     }, [isLoggedIn]);
 
     // API Calls
@@ -306,6 +330,17 @@ export default function Admin() {
                             </div>
 
                             <button type="submit" className="btn btn-primary">Sign In to Dashboard</button>
+                            <div style={{ textAlign: "center", marginTop: "16px" }}>
+                                <button
+                                    type="button"
+                                    onClick={() => { setEmail('admin@market.com'); setPassword('admin123'); }}
+                                    style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '0.8rem', cursor: 'pointer', fontFamily: 'monospace' }}
+                                    onMouseOver={(e) => e.target.style.color = 'var(--accent)'}
+                                    onMouseOut={(e) => e.target.style.color = 'var(--text-muted)'}
+                                >
+                                    [ Use Demo: admin@market.com / admin123 ]
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>

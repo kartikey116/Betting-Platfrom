@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, BarChart, Wallet as WalletIcon, CheckCircle2, ChevronLeft, Zap } from 'lucide-react';
 import Wallet from '../components/Wallet';
 import axios from 'axios';
+import { io } from 'socket.io-client';
 
 // API config
 const API_URL = 'http://localhost:5000/api';
@@ -92,9 +93,22 @@ export default function MarketBetting() {
         const token = localStorage.getItem('token');
         if (token) {
             fetchData();
-            // Poll for balance updates
-            const interval = setInterval(fetchData, 10000);
-            return () => clearInterval(interval);
+
+            // Connect to socket for real-time updates
+            const socket = io('http://localhost:5000');
+
+            socket.on('connect', () => {
+                console.log('MarketBetting socket connected');
+            });
+
+            // Listen for market related events
+            socket.on('market-status', () => fetchData());
+            socket.on('market-updated', () => fetchData());
+            socket.on('result-declared', () => fetchData());
+
+            return () => {
+                socket.disconnect();
+            };
         }
     }, [id, navigate]);
 
@@ -150,42 +164,129 @@ export default function MarketBetting() {
         }
     }, [number, activeBetTypeInfo.maxLen]);
 
+    // const handlePlaceBet = async () => {
+    //     if (market.real_status !== 'open') {
+    //         return toast.error("Market is closed. Cannot place bets.");
+    //     }
+    //     if (!number || number.length !== activeBetTypeInfo.maxLen) {
+    //         return toast.error(`Please enter ${activeBetTypeInfo.maxLen} digits for ${betType}`);
+    //     }
+    //     const amt = parseFloat(amount);
+    //     if (!amt || amt < 10) return toast.error('Minimum Stake is ₹10');
+    //     if (amt > user.wallet_balance) return toast.error('Insufficient Funds');
+
+    //     setLoading(true);
+
+    //     try {
+    //         await axios.post(`${API_URL}/bets/place`, {
+    //             marketId: market.id,
+    //             betType: betType,
+    //             selectedNumber: number,
+    //             amount: amt
+    //         });
+
+    //         // Deduct locally for immediate UI update during animation
+    //         setUser(prev => ({ ...prev, wallet_balance: prev.wallet_balance - amt }));
+
+    //         setExecutingSeq(true);
+
+    //         setTimeout(() => {
+    //             setNumber('');
+    //             setAmount('');
+    //             setLoading(false);
+    //             setTimeout(() => setExecutingSeq(false), 2000);
+    //         }, 1500);
+
+    //     } catch (error) {
+    //         console.error("Bet placement failed:", error);
+    //         toast.error(error.response?.data?.error || "Failed to place bet. Please try again.");
+    //         setLoading(false);
+    //     }
+    // };
     const handlePlaceBet = async () => {
-        if (market.computed_status !== 'open') {
+
+        /* ---------- MARKET STATUS CHECK ---------- */
+        if (!market || market.computed_status !== "open") {
             return toast.error("Market is closed. Cannot place bets.");
         }
+
+        /* ---------- NUMBER VALIDATION ---------- */
         if (!number || number.length !== activeBetTypeInfo.maxLen) {
             return toast.error(`Please enter ${activeBetTypeInfo.maxLen} digits for ${betType}`);
         }
-        const amt = parseFloat(amount);
-        if (!amt || amt < 10) return toast.error('Minimum Stake is ₹10');
-        if (amt > user.wallet_balance) return toast.error('Insufficient Funds');
+
+        /* ---------- AMOUNT VALIDATION ---------- */
+        const amt = Number(amount);
+
+        if (!amt || isNaN(amt))
+            return toast.error("Enter valid amount");
+
+        if (amt < 10)
+            return toast.error("Minimum stake ₹10");
+
+        if (amt > user.wallet_balance)
+            return toast.error("Insufficient balance");
+
+
+
+        /* ---------- BET TYPE MAPPING ---------- */
+        const typeMap = {
+            "Single": "single_digit",
+            "Jodi": "jodi",
+            "Single Panna": "single_panna",
+            "Double Panna": "double_panna",
+            "Triple Panna": "triple_panna"
+        };
+
+        const dbBetType = typeMap[betType];
+
+        if (!dbBetType)
+            return toast.error("Invalid bet type");
+
+
 
         setLoading(true);
 
         try {
-            await axios.post(`${API_URL}/bets/place`, {
+
+            const res = await axios.post(`${API_URL}/bets/place`, {
                 marketId: market.id,
-                betType: betType,
+                betType: dbBetType,
                 selectedNumber: number,
                 amount: amt
             });
 
-            // Deduct locally for immediate UI update during animation
-            setUser(prev => ({ ...prev, wallet_balance: prev.wallet_balance - amt }));
 
+            /* ---------- SAFE WALLET UPDATE ---------- */
+            setUser(prev => ({
+                ...prev,
+                wallet_balance: Math.max(0, prev.wallet_balance - amt)
+            }));
+
+
+            /* ---------- SUCCESS UI SEQUENCE ---------- */
             setExecutingSeq(true);
 
             setTimeout(() => {
-                setNumber('');
-                setAmount('');
+                setNumber("");
+                setAmount("");
                 setLoading(false);
+
                 setTimeout(() => setExecutingSeq(false), 2000);
-            }, 1500);
+            }, 1200);
+
 
         } catch (error) {
+
             console.error("Bet placement failed:", error);
-            toast.error(error.response?.data?.error || "Failed to place bet. Please try again.");
+
+            const msg =
+                error?.response?.data?.error ||
+                error?.response?.data?.message ||
+                "Failed to place bet";
+
+            toast.error(msg);
+
             setLoading(false);
         }
     };
