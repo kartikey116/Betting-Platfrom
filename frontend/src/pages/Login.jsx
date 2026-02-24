@@ -51,7 +51,7 @@ export default function Login() {
                 <div className="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-[#00f0ff]"></div>
                 <div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-[#00f0ff]"></div>
                 <div className="text-center space-y-2 mb-8">
-                    <h1 className="text-6xl sm:text-7xl mt-2 font-hand text-[#00f0ff] drop-shadow-[0_0_20px_rgba(0,240,255,0.5)] tracking-wide">
+                    <h1 className="text-5xl sm:text-7xl mt-2 font-hand font-normal text-[#00f0ff] drop-shadow-[0_0_20px_rgba(0,240,255,0.5)] tracking-wide">
                         MarketHUB
                     </h1>
                     <div className="inline-block border-t border-b border-[#d926a9] text-[#d926a9] font-mono text-[10px] tracking-[0.4em] font-bold uppercase px-6 py-2 bg-[#d926a9]/5 mt-2">
@@ -109,14 +109,14 @@ export default function Login() {
                         <button
                             type="button"
                             onClick={() => { setMobile('9999999999'); setOtp('123456'); }}
-                            className="text-[#d926a9] text-xs font-mono opacity-80 hover:opacity-100 hover:underline tracking-widest uppercase transition-all"
+                            className="text-[#d926a9] whitespace-nowrap text-xs font-mono opacity-80 hover:opacity-100 hover:underline tracking-widest uppercase transition-all"
                         >
                             [ Use Demo: 999 999 9999 / 123456 ]
                         </button>
                         <button
                             type="button"
                             onClick={() => navigate('/admin')}
-                            className="text-[#00f0ff] text-xs font-mono opacity-80 hover:opacity-100 hover:underline tracking-widest uppercase transition-all"
+                            className="text-[#00f0ff] whitespace-nowrap text-xs font-mono opacity-80 hover:opacity-100 hover:underline tracking-widest uppercase transition-all"
                         >
                             [ ACCESS ADMIN PANEL ]
                         </button>
